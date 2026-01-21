@@ -36,4 +36,4 @@ jobs:
           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
           channelId: live
           projectId: silent-room-238de
-          entryPoint: '.'
+          target: default
