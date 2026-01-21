@@ -1,8 +1,10 @@
 # Firebase App Hosting Configuration
+# Optimized for faster builds
 runConfig:
   runtime: nodejs20
   env:
     - variable: NODE_ENV
       value: production
-  buildCommand: npm ci && npm run build
+  # Use --prefer-offline to use cache when possible
+  buildCommand: npm ci --prefer-offline --no-audit && npm run build
   startCommand: npm start
