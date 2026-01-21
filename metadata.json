@@ -1,0 +1,8 @@
+{
+  "name": "SilentSpace",
+  "description": "A digital co-working space that simulates the presence of others through abstract visualization and procedural audio.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
