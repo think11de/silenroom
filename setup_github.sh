@@ -1,0 +1,13 @@
+#!/bin/bash
+echo "🔐 GitHub Authentifizierung"
+echo "=========================="
+echo ""
+echo "Bitte führe aus: gh auth login"
+echo "Wähle:"
+echo "  - GitHub.com"
+echo "  - HTTPS"
+echo "  - Login with a web browser"
+echo ""
+echo "Nach erfolgreicher Authentifizierung, führe aus:"
+echo "  gh repo create silent_room --private --source=. --remote=origin --push"
+echo ""
