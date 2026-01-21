@@ -12,8 +12,7 @@ export default defineConfig(({ mode }) => {
       plugins: [react()],
       define: {
         'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY || ''),
-        'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY || ''),
-        'process.env.NODE_ENV': JSON.stringify(mode === 'production' ? 'production' : 'development')
+        'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY || '')
       },
       resolve: {
         alias: {
@@ -21,34 +20,10 @@ export default defineConfig(({ mode }) => {
         }
       },
       build: {
+        target: 'es2020',
         minify: 'esbuild',
         sourcemap: false,
-        rollupOptions: {
-          output: {
-            manualChunks: (id) => {
-              if (id.includes('node_modules')) {
-                if (id.includes('react') || id.includes('react-dom')) {
-                  return 'react-vendor';
-                }
-                if (id.includes('firebase')) {
-                  return 'firebase-vendor';
-                }
-                if (id.includes('lucide-react')) {
-                  return 'ui-vendor';
-                }
-                return 'vendor';
-              }
-            }
-          }
-        },
-        commonjsOptions: {
-          include: [/node_modules/],
-          transformMixedEsModules: true
-        },
-        chunkSizeWarningLimit: 1000
-      },
-      optimizeDeps: {
-        include: ['react', 'react-dom', 'firebase/app', 'firebase/auth', 'lucide-react', 'trystero']
+        chunkSizeWarningLimit: 2000
       }
     };
 });

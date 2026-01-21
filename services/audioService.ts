@@ -105,25 +105,16 @@ class AudioService {
 
   // --- MP3 Player Logic ---
   private playSample(url: string) {
-    console.log('[DEBUG] Playing MP3:', url);
     const audioEl = new Audio(url);
     audioEl.loop = true;
     audioEl.crossOrigin = "anonymous"; 
     audioEl.volume = this.currentVolume; 
     
-    audioEl.onerror = () => {
-      console.error('[DEBUG] Audio load error:', audioEl.error?.message);
-    };
-    
     this.activeSample = audioEl;
 
     const playPromise = audioEl.play();
     if (playPromise !== undefined) {
-        playPromise.then(() => {
-          console.log('[DEBUG] Audio playing successfully');
-        }).catch(error => {
-            console.error("[DEBUG] Audio play() failed:", error);
-        });
+        playPromise.catch(() => {});
     }
   }
 
@@ -139,12 +130,9 @@ class AudioService {
 
     if (mode === 'cafe' && brown && pink) {
         // Cafe ambience: warm brown noise + subtle chatter-like pink noise
-        // #region agent log
-        console.log('[DEBUG] Starting cafe ambience (procedural)');
-        // #endregion
-        this.createNoiseLayer(brown, 'lowpass', 300, 0.35);  // Warm base
-        this.createNoiseLayer(pink, 'bandpass', 1500, 0.08); // Chatter-like mid frequencies
-        this.createNoiseLayer(pink, 'highpass', 3000, 0.02); // Subtle high end (cups clinking)
+        this.createNoiseLayer(brown, 'lowpass', 300, 0.35);
+        this.createNoiseLayer(pink, 'bandpass', 1500, 0.08);
+        this.createNoiseLayer(pink, 'highpass', 3000, 0.02);
         return;
     }
 
