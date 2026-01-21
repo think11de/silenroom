@@ -59,6 +59,9 @@ const App: React.FC = () => {
   
   // Ref to store current data for immediate sending to new peers
   const myDataRef = useRef<any>(null);
+
+  // Media & Interaction
+  const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   
   // Ref to store current stream for sending to new peers (avoids closure issues)
   const localStreamRef = useRef<MediaStream | null>(null);
@@ -67,9 +70,6 @@ const App: React.FC = () => {
   useEffect(() => {
     localStreamRef.current = localStream;
   }, [localStream]);
-
-  // Media & Interaction
-  const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const [isCameraOn, setIsCameraOn] = useState(false);
   const [isMicOn, setIsMicOn] = useState(false);
   const [isScreenSharing, setIsScreenSharing] = useState(false); 
