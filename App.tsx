@@ -22,16 +22,16 @@ const createGhost = (id: string): User => ({
     id: `ghost-${id}`,
     isMe: false,
     isGhost: true,
-    x: Math.random() * 90 + 5,
-    y: Math.random() * 80 + 10,
+    x: 10 + Math.random() * 80, // Safer margins (10-90%)
+    y: 15 + Math.random() * 70, // Safer margins (15-85%)
     status: Math.random() > 0.6 ? 'focus' : 'idle',
     activityLabel: Math.random() > 0.5 ? "Deep Work" : "Reviewing",
     lastActive: Date.now(),
     focusStreak: Math.floor(Math.random() * 10),
     activeSince: Date.now() - Math.random() * 3600000,
     roomMode: 'social',
-    anchorX: Math.random() * 90 + 5,
-    anchorY: Math.random() * 80 + 10
+    anchorX: 10 + Math.random() * 80,
+    anchorY: 15 + Math.random() * 70
 });
 
 const App: React.FC = () => {
@@ -118,26 +118,40 @@ const App: React.FC = () => {
       return unsub;
   }, []);
 
-  // Ghost Loop: Dynamically add/remove ghosts with sound
+  // Ghost Loop: Dynamically add/remove/move ghosts with sound
   useEffect(() => {
       if (!audio.isPlaying && !personalPomo.isActive) return;
 
       const interval = setInterval(() => {
-          if (Math.random() > 0.6) { // 40% chance to update ghosts
+          // 1. Move existing ghosts gently
+          setGhosts(prev => prev.map(g => {
+              if (Math.random() > 0.3) return g; // Only move some
+              const driftX = (Math.random() - 0.5) * 4;
+              const driftY = (Math.random() - 0.5) * 4;
+              let newX = g.x + driftX;
+              let newY = g.y + driftY;
+              // Boundary check (10-90%)
+              newX = Math.max(10, Math.min(90, newX));
+              newY = Math.max(15, Math.min(85, newY));
+              
+              return { ...g, x: newX, y: newY };
+          }));
+
+          // 2. Add/Remove logic
+          if (Math.random() > 0.7) { // Slower churn
               setGhosts(prev => {
-                  const shouldAdd = Math.random() > 0.4 && prev.length < 8;
+                  const shouldAdd = Math.random() > 0.45 && prev.length < 8;
                   if (shouldAdd) {
-                      // BING! New ghost arrived
-                      audioService.playClick();
+                      audioService.playJoin();
                       return [...prev, createGhost(Date.now().toString())];
-                  } else if (prev.length > 2) {
-                      // Remove oldest ghost
+                  } else if (prev.length > 2 && Math.random() > 0.5) {
+                      audioService.playLeave();
                       return prev.slice(1); 
                   }
                   return prev;
               });
           }
-      }, 5000); // Check every 5 seconds
+      }, 3000); 
       return () => clearInterval(interval);
   }, [audio.isPlaying, personalPomo.isActive]);
 
@@ -433,8 +447,10 @@ const App: React.FC = () => {
 
   const handleEnterBreakRoom = () => {
       setIsInBreakRoom(true);
-      // Auto-enable camera in break room
+      // Enable Mic and Cam for Break Room automatically
       updateMediaStream(true, true, false);
+      // Mute background audio slightly? Optional.
+      audioService.setVolume(0.2); 
   };
 
   // Personal Pomodoro Tick
