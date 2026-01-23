@@ -1,6 +1,47 @@
 import React from 'react';
-import { Play, Pause, Volume2, VolumeX, CloudRain, Book, Coffee, Camera, CameraOff, Mic, MicOff, Activity, MessageSquare, Moon, Sun, Lock, MonitorUp, MonitorOff, Users, PictureInPicture, Timer } from 'lucide-react';
+import { Play, Pause, Volume2, VolumeX, CloudRain, Book, Coffee, Camera, CameraOff, Mic, MicOff, Activity, MessageSquare, Moon, Sun, MonitorUp, MonitorOff, Users, PictureInPicture, Timer } from 'lucide-react';
 import { AudioState, TimerState, RoomMode } from '../types';
+
+interface ControlsProps {
+  timer: TimerState;
+  onToggleTimer: () => void;
+  audio: AudioState;
+  onToggleAudio: () => void;
+  onVolumeChange: (val: number) => void;
+  onModeChange: (mode: AudioState['mode']) => void;
+  activeCount: number;
+  isCameraOn: boolean;
+  onToggleCamera: () => void;
+  isMicOn: boolean;
+  onToggleMic: () => void;
+  isScreenSharing: boolean;
+  onToggleScreenShare: () => void;
+  
+  currentGoal: string;
+  onGoalChange: (goal: string) => void;
+  onPulse: () => void;
+  
+  unreadCount: number;
+  onToggleChat: () => void;
+  isChatOpen: boolean;
+
+  roomMode: RoomMode;
+  onToggleRoomMode: () => void;
+  
+  isInBreakRoom: boolean;
+  onEnterBreakRoom: () => void;
+  
+  // New
+  onTogglePiP: () => void;
+  personalPomodoro: { isActive: boolean; timeLeft: number; cycles: number };
+  onTogglePersonalPomodoro: () => void;
+}
+
+const formatTime = (seconds: number) => {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+};
 
 interface ControlBtnProps {
   onClick: () => void;
