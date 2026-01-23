@@ -1,10 +1,15 @@
 import React from 'react';
+<<<<<<< HEAD
 import { Play, Pause, Volume2, VolumeX, CloudRain, Book, Coffee, Camera, CameraOff, Mic, MicOff, Activity, MessageSquare, Moon, Sun, MonitorUp, MonitorOff, Users, PictureInPicture, Timer } from 'lucide-react';
+=======
+import { Play, Pause, Volume2, VolumeX, CloudRain, Book, Coffee, Camera, CameraOff, Mic, MicOff, Activity, MessageSquare, Moon, Sun, Lock, MonitorUp, MonitorOff, Users, PictureInPicture, Timer, Sparkles } from 'lucide-react';
+>>>>>>> 7510e8d (Update: Add Think11 ambience and UI polish)
 import { AudioState, TimerState, RoomMode } from '../types';
 
 interface ControlsProps {
   timer: TimerState;
   onToggleTimer: () => void;
+  teamSprintCount: number;
   audio: AudioState;
   onToggleAudio: () => void;
   onVolumeChange: (val: number) => void;
@@ -33,7 +38,12 @@ interface ControlsProps {
   
   // New
   onTogglePiP: () => void;
+<<<<<<< HEAD
   personalPomodoro: { isActive: boolean; timeLeft: number; cycles: number };
+=======
+  personalPomodoro: { isActive: boolean; timeLeft: number };
+  personalPomodoroCycles: number;
+>>>>>>> 7510e8d (Update: Add Think11 ambience and UI polish)
   onTogglePersonalPomodoro: () => void;
 }
 
@@ -71,6 +81,7 @@ const ControlBtn: React.FC<ControlBtnProps> = ({ onClick, active, disabled, icon
 export const Controls: React.FC<ControlsProps> = ({
   timer,
   onToggleTimer, // Team Timer
+  teamSprintCount,
   audio,
   onToggleAudio,
   onVolumeChange,
@@ -93,6 +104,7 @@ export const Controls: React.FC<ControlsProps> = ({
   onEnterBreakRoom,
   onTogglePiP,
   personalPomodoro,
+  personalPomodoroCycles,
   onTogglePersonalPomodoro
 }) => {
   const isVoid = roomMode === 'void';
@@ -113,8 +125,13 @@ export const Controls: React.FC<ControlsProps> = ({
          {!isVoid && (
              <div className="glass-panel p-2 rounded-xl flex items-center gap-3 shadow-xl">
                  <div className="flex gap-1">
+<<<<<<< HEAD
                     {[{ id: 'cafe', icon: Coffee, label: 'Cafe' }, { id: 'rain', icon: CloudRain, label: 'Rain' }, { id: 'library', icon: Book, label: 'Library' }].map((mode) => (
                         <button key={mode.id} title={mode.label} onClick={() => onModeChange(mode.id as any)} className={`p-2 rounded-lg transition-all ${audio.mode === mode.id ? 'bg-[#f70b28] text-white shadow-lg scale-105' : 'text-zinc-600 hover:text-zinc-300 hover:bg-white/5'}`}><mode.icon size={16} /></button>
+=======
+                    {[{ id: 'think11', icon: Sparkles }, { id: 'cafe', icon: Coffee }, { id: 'rain', icon: CloudRain }, { id: 'library', icon: Book }].map((mode) => (
+                        <button key={mode.id} onClick={() => onModeChange(mode.id as any)} className={`p-1.5 rounded-md transition-all ${audio.mode === mode.id ? 'bg-[#f70b28] text-white' : 'text-zinc-600'}`}><mode.icon size={14} /></button>
+>>>>>>> 7510e8d (Update: Add Think11 ambience and UI polish)
                     ))}
                  </div>
                  <div className="h-6 w-[1px] bg-white/10"></div>
@@ -138,6 +155,9 @@ export const Controls: React.FC<ControlsProps> = ({
               <div className="text-2xl font-['JetBrains_Mono'] font-medium tabular-nums tracking-tight leading-none text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">
                   {formatTime(timer.timeLeft)}
               </div>
+              <div className="text-[9px] uppercase tracking-[0.2em] text-zinc-500 font-bold">
+                  Sprints heute: {teamSprintCount}
+              </div>
               <input 
                 type="text"
                 value={currentGoal}
@@ -149,6 +169,7 @@ export const Controls: React.FC<ControlsProps> = ({
           </div>
       </div>
 
+<<<<<<< HEAD
       {/* Right: Actions Toolbar */}
       <div className="pointer-events-auto glass-panel rounded-2xl p-3 flex gap-3 shadow-2xl items-center border border-white/5 bg-black/60 backdrop-blur-xl">
           
@@ -166,6 +187,59 @@ export const Controls: React.FC<ControlsProps> = ({
                  {/* @ts-ignore */}
                  CYCLES: {personalPomodoro.cycles || 0}
              </span>
+=======
+      {/* Right: Actions */}
+      <div className="pointer-events-auto glass-panel rounded-2xl p-2 flex flex-wrap gap-3 shadow-2xl">
+          {/* Personal Pomodoro */}
+          <div className="flex flex-col items-center gap-1">
+              <button
+                onClick={onTogglePersonalPomodoro}
+                className={`relative w-10 h-10 rounded-xl flex items-center justify-center transition-all ${personalPomodoro.isActive ? 'bg-emerald-600 text-white' : 'bg-white/5 text-zinc-400 hover:text-white'}`}
+                title="Personal Pomodoro"
+              >
+                  <Timer size={18} />
+                  {personalPomodoro.isActive && <span className="absolute top-0 right-0 w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>}
+              </button>
+              <span className="text-[9px] uppercase tracking-wider text-zinc-500">Pomo {personalPomodoroCycles}</span>
+          </div>
+
+          <div className="w-[1px] bg-white/10 my-1 mx-1"></div>
+
+          <div className="flex flex-col items-center gap-1">
+              <button onClick={onEnterBreakRoom} className="w-10 h-10 rounded-xl flex items-center justify-center bg-white/5 text-zinc-400 hover:text-white hover:bg-[#f70b28]"><Users size={18} /></button>
+              <span className="text-[9px] uppercase tracking-wider text-zinc-500">Break</span>
+          </div>
+          <div className="flex flex-col items-center gap-1">
+              <button onClick={onPulse} className="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-white/5 text-zinc-400 hover:text-[#f70b28]"><Activity size={18} /></button>
+              <span className="text-[9px] uppercase tracking-wider text-zinc-500">Ping</span>
+          </div>
+          
+          <div className="w-[1px] bg-white/10 my-1 mx-1"></div>
+
+          <div className="flex flex-col items-center gap-1">
+              <button onClick={onToggleCamera} disabled={isVoid} className={`w-10 h-10 rounded-xl flex items-center justify-center ${isCameraOn ? 'bg-white text-black' : 'text-zinc-400 hover:bg-white/5'}`}>{isCameraOn ? <Camera size={18} /> : <CameraOff size={18} />}</button>
+              <span className="text-[9px] uppercase tracking-wider text-zinc-500">Cam</span>
+          </div>
+          <div className="flex flex-col items-center gap-1">
+              <button onClick={onToggleMic} disabled={isVoid} className={`w-10 h-10 rounded-xl flex items-center justify-center ${isMicOn ? 'bg-[#f70b28] text-white' : 'text-zinc-400 hover:bg-white/5'}`}>{isMicOn ? <Mic size={18} /> : <MicOff size={18} />}</button>
+              <span className="text-[9px] uppercase tracking-wider text-zinc-500">Mic</span>
+          </div>
+          <div className="flex flex-col items-center gap-1">
+              <button onClick={onToggleScreenShare} disabled={isVoid} className={`w-10 h-10 rounded-xl flex items-center justify-center ${isScreenSharing ? 'bg-[#f70b28] text-white' : 'text-zinc-400 hover:bg-white/5'}`}>{isScreenSharing ? <MonitorOff size={18} /> : <MonitorUp size={18} />}</button>
+              <span className="text-[9px] uppercase tracking-wider text-zinc-500">Share</span>
+          </div>
+          
+          <div className="w-[1px] bg-white/10 my-1 mx-1"></div>
+
+          <div className="flex flex-col items-center gap-1">
+              <button onClick={onTogglePiP} className="w-10 h-10 rounded-xl flex items-center justify-center text-zinc-400 hover:bg-white/5 hover:text-white" title="Picture in Picture"><PictureInPicture size={18} /></button>
+              <span className="text-[9px] uppercase tracking-wider text-zinc-500">PiP</span>
+          </div>
+          <div className="relative flex flex-col items-center gap-1">
+            <button onClick={onToggleChat} className={`w-10 h-10 rounded-xl flex items-center justify-center ${isChatOpen ? 'bg-white/10 text-white' : 'text-zinc-400 hover:bg-white/5'}`}><MessageSquare size={18} /></button>
+            {unreadCount > 0 && <span className="absolute top-0 right-0 w-3 h-3 bg-[#f70b28] rounded-full border-2 border-black"></span>}
+            <span className="text-[9px] uppercase tracking-wider text-zinc-500">Chat</span>
+>>>>>>> 7510e8d (Update: Add Think11 ambience and UI polish)
           </div>
 
           <div className="w-[1px] h-8 bg-white/10"></div>

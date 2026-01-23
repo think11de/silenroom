@@ -5,6 +5,7 @@ class AudioService {
   private ctx: AudioContext | null = null;
   private masterGain: GainNode | null = null;
   private currentVolume: number = 0.5;
+  private readonly think11SampleUrl = 'https://think11.de/wp-content/uploads/2026/01/07048123.wav';
   
   // Active Sound Nodes (WebAudio)
   private nodes: {
@@ -120,10 +121,15 @@ class AudioService {
 
   // --- Main Logic ---
 
-  async startAmbience(mode: 'rain' | 'library' | 'cafe') {
+  async startAmbience(mode: 'think11' | 'rain' | 'library' | 'cafe') {
     if (!this.ctx) await this.init(); 
     
     this.stopAmbience();
+
+    if (mode === 'think11') {
+        this.playSample(this.think11SampleUrl);
+        return;
+    }
 
     const brown = this.createBuffer('brown');
     const pink = this.createBuffer('pink');
@@ -262,6 +268,52 @@ class AudioService {
       gain.connect(this.masterGain);
       osc.start();
       osc.stop(t + 0.5);
+  }
+
+  async playSoftPing() {
+    if (!this.ctx) await this.init();
+    if (!this.ctx || !this.masterGain) return;
+
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    const filter = this.ctx.createBiquadFilter();
+
+    osc.frequency.value = 720;
+    osc.type = 'sine';
+    filter.type = 'lowpass';
+    filter.frequency.value = 1200;
+
+    gain.gain.setValueAtTime(0.0001, this.ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.03, this.ctx.currentTime + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.18);
+
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(this.masterGain);
+
+    osc.start();
+    osc.stop(this.ctx.currentTime + 0.2);
+  }
+
+  async playSoftExit() {
+    if (!this.ctx) await this.init();
+    if (!this.ctx || !this.masterGain) return;
+
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    osc.frequency.value = 520;
+    osc.type = 'sine';
+
+    gain.gain.setValueAtTime(0.0001, this.ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.02, this.ctx.currentTime + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.2);
+
+    osc.connect(gain);
+    gain.connect(this.masterGain);
+
+    osc.start();
+    osc.stop(this.ctx.currentTime + 0.22);
   }
 }
 

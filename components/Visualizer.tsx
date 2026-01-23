@@ -8,6 +8,7 @@ interface VisualizerProps {
   roomMode: RoomMode; 
   onUserClick: (user: User) => void;
   focusedPeerId: string | null; 
+  isWorkMuted: boolean;
 }
 
 const TOOLS = {
@@ -51,7 +52,7 @@ const ProgressRing = React.memo(({ progress, size, stroke, color }: { progress: 
 });
 
 // Heavily optimized Avatar Component
-const UserAvatar = React.memo(({ user, onClick, shouldMute }: { user: User; onClick: (u: User) => void; shouldMute: boolean }) => {
+const UserAvatar = React.memo(({ user, onClick, shouldMute, isWorkMuted }: { user: User; onClick: (u: User) => void; shouldMute: boolean; isWorkMuted: boolean }) => {
   const isIdle = user.status === 'idle';
   const isVoid = user.roomMode === 'void';
   const isRealUser = !user.isGhost;
@@ -66,9 +67,9 @@ const UserAvatar = React.memo(({ user, onClick, shouldMute }: { user: User; onCl
     if (videoRef.current && user.stream && !isVoid) {
         if (videoRef.current.srcObject !== user.stream) videoRef.current.srcObject = user.stream;
         if (videoRef.current.paused) videoRef.current.play().catch(console.error);
-        videoRef.current.muted = user.isMe || shouldMute; 
+        videoRef.current.muted = user.isMe || shouldMute || isWorkMuted; 
     }
-  }, [user.stream, isVoid, user.isMe, shouldMute]);
+  }, [user.stream, isVoid, user.isMe, shouldMute, isWorkMuted]);
 
   // Determine Icon
   const CategoryIcon = details.category === 'coding' ? Code2 
@@ -107,11 +108,11 @@ const UserAvatar = React.memo(({ user, onClick, shouldMute }: { user: User; onCl
 
   return (
     <div 
-      className={`absolute group flex flex-col items-center justify-center transform -translate-x-1/2 -translate-y-1/2 transition-all duration-1000 cubic-bezier(0.25, 1, 0.5, 1) animate-float ${isClickable ? 'cursor-pointer z-20 hover:z-50' : 'cursor-default z-0'}`}
+      className={`absolute group flex flex-col items-center justify-center transform -translate-x-1/2 -translate-y-1/2 transition-all duration-1000 cubic-bezier(0.25, 1, 0.5, 1) ${isClickable ? 'cursor-pointer z-20 hover:z-50' : 'cursor-default z-0'}`}
       style={{ left: `${user.x}%`, top: `${user.y}%` }}
       onClick={() => isClickable && onClick(user)}
     >
-      <div className={`relative flex flex-col items-center justify-center transition-all duration-[2000ms] ${isIdle ? 'scale-90 opacity-40' : 'scale-100 opacity-100'}`}>
+      <div className={`relative flex flex-col items-center justify-center transition-all duration-[2000ms] avatar-drift ${isIdle ? 'scale-90 opacity-40' : 'scale-100 opacity-100'}`}>
           
           {progress > 0 && (
               <ProgressRing progress={progress} size={isRealUser ? (hasVideo ? 280 : 150) : 70} stroke={3} color={ringColor} />
@@ -120,7 +121,7 @@ const UserAvatar = React.memo(({ user, onClick, shouldMute }: { user: User; onCl
           <div className={`relative rounded-full bg-black transition-all duration-[2000ms] ${containerClass}`}>
             {hasVideo ? (
                 <div className={`${AvatarSize} rounded-full overflow-hidden bg-zinc-900 relative`}>
-                    <video ref={videoRef} autoPlay playsInline className={`w-full h-full object-cover ${user.isScreenSharing ? '' : 'transform scale-x-[-1]'}`} />
+                    <video ref={videoRef} data-peer-id={user.id} autoPlay playsInline className={`w-full h-full object-cover ${user.isScreenSharing ? '' : 'transform scale-x-[-1]'}`} />
                     {!user.isMicOn && !isVoid && (
                         <div className="absolute bottom-3 right-3 bg-black/80 p-1.5 rounded-full border border-white/10"><MicOff size={10} className="text-zinc-500" /></div>
                     )}
@@ -292,19 +293,25 @@ const NeuralBackground = React.memo(({ users, roomMode }: { users: User[], roomM
 });
 
 
-export const Visualizer: React.FC<VisualizerProps> = ({ users, roomMode, onUserClick, focusedPeerId }) => {
+export const Visualizer: React.FC<VisualizerProps> = ({ users, roomMode, onUserClick, focusedPeerId, isWorkMuted }) => {
   const isVoid = roomMode === 'void';
 
   return (
     <div className={`relative w-full h-full overflow-hidden transition-colors duration-1000 ${isVoid ? 'bg-[#000000]' : 'bg-[#050505]'}`}> 
         <div className="absolute inset-0 pointer-events-none transition-opacity duration-1000" style={{ background: isVoid ? `radial-gradient(circle at 50% 120%, #1e1b4b 0%, #000000 60%)` : `radial-gradient(circle at 50% 120%, #1a0a05 0%, #050505 60%)` }} />
         
+<<<<<<< HEAD
         {/* Animated background branding */}
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none flex items-center justify-center">
             <div className={`text-[30vw] leading-none font-black ${isVoid ? 'text-indigo-500' : 'text-[#f70b28]'} opacity-[0.03] blur-[60px] animate-pulse transition-all duration-[5000ms]`}
                  style={{ animationDuration: '8s' }}>
                 11
             </div>
+=======
+        {/* Static background text */}
+        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none">
+            <div className={`absolute -bottom-20 -right-10 text-[35vw] leading-none font-black ${isVoid ? 'text-indigo-500' : 'text-[#f70b28]'} think11-pulse blur-[80px]`}>11</div>
+>>>>>>> 7510e8d (Update: Add Think11 ambience and UI polish)
         </div>
 
         <NeuralBackground users={users} roomMode={roomMode} />
@@ -316,6 +323,7 @@ export const Visualizer: React.FC<VisualizerProps> = ({ users, roomMode, onUserC
             user={user} 
             onClick={onUserClick}
             shouldMute={focusedPeerId !== null && focusedPeerId !== user.id}
+            isWorkMuted={isWorkMuted}
           />
         ))}
     </div>

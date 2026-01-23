@@ -16,22 +16,40 @@ import { onAuthStateChanged } from 'firebase/auth';
 const ROOM_ID = 'think11_hq_v5'; 
 const TYPING_TIMEOUT = 1200; 
 const PERSONAL_WORK_TIME = 25 * 60; 
+const SAFE_BOUNDS = { minX: 8, maxX: 92, minY: 10, maxY: 72 };
+
+const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
+const randomInRange = (min: number, max: number) => min + Math.random() * (max - min);
+const clampPosition = (x: number, y: number) => ({
+  x: clamp(x, SAFE_BOUNDS.minX, SAFE_BOUNDS.maxX),
+  y: clamp(y, SAFE_BOUNDS.minY, SAFE_BOUNDS.maxY)
+});
 
 // --- Ghosts Logic (Dynamic) ---
 const createGhost = (id: string): User => ({
     id: `ghost-${id}`,
     isMe: false,
     isGhost: true,
+<<<<<<< HEAD
     x: 10 + Math.random() * 80, // Safer margins (10-90%)
     y: 15 + Math.random() * 70, // Safer margins (15-85%)
+=======
+    x: randomInRange(SAFE_BOUNDS.minX, SAFE_BOUNDS.maxX),
+    y: randomInRange(SAFE_BOUNDS.minY, SAFE_BOUNDS.maxY),
+>>>>>>> 7510e8d (Update: Add Think11 ambience and UI polish)
     status: Math.random() > 0.6 ? 'focus' : 'idle',
     activityLabel: Math.random() > 0.5 ? "Deep Work" : "Reviewing",
     lastActive: Date.now(),
     focusStreak: Math.floor(Math.random() * 10),
     activeSince: Date.now() - Math.random() * 3600000,
     roomMode: 'social',
+<<<<<<< HEAD
     anchorX: 10 + Math.random() * 80,
     anchorY: 15 + Math.random() * 70
+=======
+    anchorX: randomInRange(SAFE_BOUNDS.minX, SAFE_BOUNDS.maxX),
+    anchorY: randomInRange(SAFE_BOUNDS.minY, SAFE_BOUNDS.maxY)
+>>>>>>> 7510e8d (Update: Add Think11 ambience and UI polish)
 });
 
 const App: React.FC = () => {
@@ -40,17 +58,18 @@ const App: React.FC = () => {
   const [authLoading, setAuthLoading] = useState(true);
 
   // App State
-  const [roomMode, setRoomMode] = useState<RoomMode>('social');
-  const [audio, setAudio] = useState<AudioState>({ isPlaying: false, volume: 0.7, mode: 'cafe' });
+  const [roomMode, setRoomMode] = useState<RoomMode>('void');
+  const [audio, setAudio] = useState<AudioState>({ isPlaying: false, volume: 0.7, mode: 'think11' });
   const [timer, setTimer] = useState<TimerState>({ isActive: false, timeLeft: 50*60, duration: 50*60, mode: 'focus' }); 
+  const [teamSprintCount, setTeamSprintCount] = useState(0);
   
   // Personal Pomodoro
   const [personalPomo, setPersonalPomo] = useState({ isActive: false, timeLeft: PERSONAL_WORK_TIME, cycles: 0 });
 
   // Local User - randomize start position to prevent overlap
   const [myPos, setMyPos] = useState(() => ({ 
-    x: 20 + Math.random() * 60,  // Range: 20-80%
-    y: 20 + Math.random() * 60   // Range: 20-80%
+    x: randomInRange(SAFE_BOUNDS.minX, SAFE_BOUNDS.maxX),
+    y: randomInRange(SAFE_BOUNDS.minY, SAFE_BOUNDS.maxY)
   })); 
   const [myStatus, setMyStatus] = useState<UserStatus>('idle');
   const [myGoal, setMyGoal] = useState<string>("");
@@ -103,6 +122,23 @@ const App: React.FC = () => {
     isChatOpenRef.current = isChatOpen;
   }, [isChatOpen]);
 
+  useEffect(() => {
+    const today = new Date().toDateString();
+    const storedDate = localStorage.getItem('think11_sprint_date');
+    const storedCount = localStorage.getItem('think11_sprint_count');
+    if (storedDate === today && storedCount) {
+      setTeamSprintCount(Number.parseInt(storedCount, 10) || 0);
+    } else {
+      localStorage.setItem('think11_sprint_date', today);
+      localStorage.setItem('think11_sprint_count', '0');
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('think11_sprint_date', new Date().toDateString());
+    localStorage.setItem('think11_sprint_count', String(teamSprintCount));
+  }, [teamSprintCount]);
+
   // Auth Listener
   useEffect(() => {
       const unsub = onAuthStateChanged(auth, (u) => {
@@ -142,10 +178,19 @@ const App: React.FC = () => {
               setGhosts(prev => {
                   const shouldAdd = Math.random() > 0.45 && prev.length < 8;
                   if (shouldAdd) {
+<<<<<<< HEAD
                       audioService.playJoin();
                       return [...prev, createGhost(Date.now().toString())];
                   } else if (prev.length > 2 && Math.random() > 0.5) {
                       audioService.playLeave();
+=======
+                      // Soft ping for arrival
+                      void audioService.init().then(() => audioService.playSoftPing()).catch(() => {});
+                      return [...prev, createGhost(Date.now().toString())];
+                  } else if (prev.length > 2) {
+                      void audioService.init().then(() => audioService.playSoftExit()).catch(() => {});
+                      // Remove oldest ghost
+>>>>>>> 7510e8d (Update: Add Think11 ambience and UI polish)
                       return prev.slice(1); 
                   }
                   return prev;
@@ -154,6 +199,19 @@ const App: React.FC = () => {
       }, 3000); 
       return () => clearInterval(interval);
   }, [audio.isPlaying, personalPomo.isActive]);
+
+  // Ghost drift: subtle movement to add life
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setGhosts(prev => prev.map(g => {
+        const driftX = (Math.random() - 0.5) * 3;
+        const driftY = (Math.random() - 0.5) * 3;
+        const next = clampPosition((g.anchorX ?? g.x) + driftX, (g.anchorY ?? g.y) + driftY);
+        return { ...g, x: next.x, y: next.y };
+      }));
+    }, 2200);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleDemoBypass = () => {
       const demoUser = {
@@ -204,6 +262,7 @@ const App: React.FC = () => {
         if (currentStream && currentStream.active) {
             addPeerStream.current(currentStream, peerId);
         }
+        void audioService.init().then(() => audioService.playSoftPing()).catch(() => {});
     });
 
     getData((data: any, peerId: string) => {
@@ -212,8 +271,9 @@ const App: React.FC = () => {
             const existing = next.get(peerId);
             
             // Check for position collision with other peers and adjust if needed
-            let adjustedX = data.x;
-            let adjustedY = data.y;
+            const clamped = clampPosition(data.x, data.y);
+            let adjustedX = clamped.x;
+            let adjustedY = clamped.y;
             const minDistance = 8; // Minimum distance in percentage
             
             for (const [otherId, otherUser] of next.entries()) {
@@ -259,12 +319,13 @@ const App: React.FC = () => {
             } else {
                 // Stream arrived before user data - create placeholder with stream
                 // Position will be adjusted when user data arrives via getData
+                const clamped = clampPosition(20 + Math.random() * 60, 20 + Math.random() * 60);
                 next.set(peerId, { 
                     id: peerId, 
                     isMe: false, 
                     isGhost: false,
-                    x: 20 + Math.random() * 60, // Random position, will be adjusted if collision
-                    y: 20 + Math.random() * 60,
+                    x: clamped.x, // Random position, will be adjusted if collision
+                    y: clamped.y,
                     status: 'idle' as const,
                     lastActive: Date.now(),
                     focusStreak: 0,
@@ -280,6 +341,7 @@ const App: React.FC = () => {
     room.onPeerLeave((id: string) => {
         setPeers(prev => { const n = new Map(prev); n.delete(id); return n; });
         if(focusedPeerId === id) setFocusedPeerId(null);
+        void audioService.init().then(() => audioService.playSoftExit()).catch(() => {});
     });
 
     return () => room.leave();
@@ -290,17 +352,19 @@ const App: React.FC = () => {
       if (!user) return;
       
       const interval = setInterval(() => {
-          const personalPomoData = personalPomo.isActive ? {
-              isActive: true,
+          const personalPomoData = {
+              isActive: personalPomo.isActive,
               mode: 'focus' as const,
               startTime: Date.now() - ((25*60 - personalPomo.timeLeft)*1000),
               duration: 25*60,
               completedCycles: personalPomo.cycles
-          } : undefined;
+          };
+          const clamped = clampPosition(myPos.x, myPos.y);
+          const sprintStartTime = timer.isActive ? Date.now() - ((timer.duration - timer.timeLeft) * 1000) : undefined;
 
           const myData = {
-              x: myPos.x,
-              y: myPos.y,
+              x: clamped.x,
+              y: clamped.y,
               status: myStatus,
               activityLabel: personalPomo.isActive ? "Personal Flow" : (myStatus === 'focus' ? 'Working' : 'Idle'),
               currentGoal: myGoal,
@@ -310,6 +374,10 @@ const App: React.FC = () => {
               name: user.displayName || 'Guest',
               photoUrl: user.photoURL,
               pomodoroState: personalPomoData,
+              isInSprint: timer.isActive,
+              sprintDuration: timer.isActive ? timer.duration : undefined,
+              sprintStartTime,
+              sprintCountToday: teamSprintCount,
               activeSince: myJoinedAt.current,
               joinedAt: myJoinedAt.current
           };
@@ -321,14 +389,15 @@ const App: React.FC = () => {
           sendStatusUpdate.current(myData);
       }, 1500); // Increased frequency slightly for better sync
       return () => clearInterval(interval);
-  }, [user, myPos, myStatus, myGoal, myLastPulse, isCameraOn, isMicOn, isScreenSharing, isInBreakRoom, roomMode, personalPomo]);
+  }, [user, myPos, myStatus, myGoal, myLastPulse, isCameraOn, isMicOn, isScreenSharing, isInBreakRoom, roomMode, personalPomo, timer, teamSprintCount]);
 
 
   // --- Logic Handlers ---
   // #region agent log
-  const updateMediaStream = async (wantCam: boolean, wantMic: boolean, wantScreen: boolean = false) => {
+  const updateMediaStream = async (wantCam: boolean, wantMic: boolean, wantScreen: boolean = false, modeOverride?: RoomMode) => {
       console.log('[DEBUG updateMediaStream]', {wantCam, wantMic, wantScreen, hasLocalStream: !!localStream});
-      if (roomMode === 'void') wantMic = false;
+      const effectiveMode = modeOverride ?? roomMode;
+      if (effectiveMode === 'void') wantMic = false;
   // #endregion
 
       // Handle Screen Share
@@ -423,10 +492,13 @@ const App: React.FC = () => {
              pipWindow.document.body.append(div);
           } catch(e) { console.error(e); }
       } else {
-          const videos = document.getElementsByTagName('video');
-          if (videos.length > 0) {
+          const focusedVideo = focusedPeerId ? document.querySelector(`video[data-peer-id="${focusedPeerId}"]`) as HTMLVideoElement | null : null;
+          const myVideo = user ? document.querySelector(`video[data-peer-id="${user.uid}"]`) as HTMLVideoElement | null : null;
+          const anyVideo = document.querySelector('video[data-peer-id]') as HTMLVideoElement | null;
+          const target = focusedVideo || myVideo || anyVideo;
+          if (target) {
               // @ts-ignore
-              if (videos[0] !== document.pictureInPictureElement) videos[0].requestPictureInPicture();
+              if (target !== document.pictureInPictureElement) target.requestPictureInPicture();
               // @ts-ignore
               else document.exitPictureInPicture();
           } else {
@@ -447,10 +519,22 @@ const App: React.FC = () => {
 
   const handleEnterBreakRoom = () => {
       setIsInBreakRoom(true);
+<<<<<<< HEAD
       // Enable Mic and Cam for Break Room automatically
       updateMediaStream(true, true, false);
       // Mute background audio slightly? Optional.
       audioService.setVolume(0.2); 
+=======
+      // Auto-enable camera in break room
+      setRoomMode('social');
+      updateMediaStream(true, true, false, 'social');
+  };
+
+  const handleLeaveBreakRoom = () => {
+      setIsInBreakRoom(false);
+      setRoomMode('void');
+      updateMediaStream(isCameraOn, false, false, 'void');
+>>>>>>> 7510e8d (Update: Add Think11 ambience and UI polish)
   };
 
   // Personal Pomodoro Tick
@@ -468,6 +552,23 @@ const App: React.FC = () => {
       return () => clearInterval(int);
   }, [personalPomo.isActive]);
 
+  // Team Sprint Tick
+  useEffect(() => {
+      if (!timer.isActive) return;
+      const interval = setInterval(() => {
+          setTimer(t => {
+              if (!t.isActive) return t;
+              if (t.timeLeft <= 1) {
+                  void audioService.init().then(() => audioService.playAlert()).catch(() => {});
+                  setTeamSprintCount(c => c + 1);
+                  return { ...t, isActive: false, timeLeft: t.duration };
+              }
+              return { ...t, timeLeft: t.timeLeft - 1 };
+          });
+      }, 1000);
+      return () => clearInterval(interval);
+  }, [timer.isActive, timer.duration]);
+
   // Input Handling
   const handleUserActivity = useCallback(() => {
       if(myStatus === 'idle') setMyStatus('typing');
@@ -481,20 +582,40 @@ const App: React.FC = () => {
       return () => { window.removeEventListener('keydown', handleUserActivity); window.removeEventListener('mousemove', handleUserActivity); };
   }, [handleUserActivity]);
 
+  useEffect(() => {
+      if (roomMode === 'void' && isMicOn) {
+          updateMediaStream(isCameraOn, false, false, 'void');
+      }
+  }, [roomMode, isMicOn, isCameraOn]);
+
   // --- Render ---
   if (authLoading) return <div className="w-full h-screen bg-[#050505] flex items-center justify-center text-[#f70b28] animate-pulse">Initializing...</div>;
   if (!user) return <AuthModal onBypass={handleDemoBypass} />;
+
+  const sprintStartTime = timer.isActive ? Date.now() - ((timer.duration - timer.timeLeft) * 1000) : undefined;
+  const pomodoroState = {
+      isActive: personalPomo.isActive,
+      mode: 'focus' as const,
+      startTime: Date.now() - ((PERSONAL_WORK_TIME - personalPomo.timeLeft) * 1000),
+      duration: PERSONAL_WORK_TIME,
+      completedCycles: personalPomo.cycles
+  };
+  const myClamped = clampPosition(myPos.x, myPos.y);
 
   const myUser: User = {
       id: user.uid,
       isMe: true, isGhost: false,
       name: user.displayName || "Me", photoUrl: user.photoURL || undefined,
-      x: myPos.x, y: myPos.y, status: myStatus,
+      x: myClamped.x, y: myClamped.y, status: myStatus,
       activityLabel: "Me", currentGoal: myGoal,
       isCameraOn, isMicOn, isScreenSharing, isInBreakRoom, roomMode,
       stream: localStream || undefined,
       lastActive: Date.now(), focusStreak: 0,
-      pomodoroState: personalPomo.isActive ? { isActive: true, mode: 'focus', startTime: Date.now() - ((PERSONAL_WORK_TIME - personalPomo.timeLeft)*1000), duration: PERSONAL_WORK_TIME, completedCycles: personalPomo.cycles } : undefined
+      pomodoroState,
+      isInSprint: timer.isActive,
+      sprintDuration: timer.isActive ? timer.duration : undefined,
+      sprintStartTime,
+      sprintCountToday: teamSprintCount
   };
 
   const allUsers = [myUser, ...ghosts, ...Array.from(peers.values())];
@@ -517,7 +638,7 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {isInBreakRoom && <BreakRoom users={allUsers} onLeave={() => setIsInBreakRoom(false)} />}
+      {isInBreakRoom && <BreakRoom users={allUsers} onLeave={handleLeaveBreakRoom} />}
       
       {focusedPeer && !isInBreakRoom && <PrivateTalkModal me={myUser} peer={focusedPeer} onExit={() => setFocusedPeerId(null)} />}
 
@@ -533,6 +654,7 @@ const App: React.FC = () => {
             roomMode={roomMode} 
             onUserClick={(u) => setFocusedPeerId(u.id)}
             focusedPeerId={focusedPeerId}
+            isWorkMuted={!isInBreakRoom}
         />
       )}
 
@@ -541,7 +663,12 @@ const App: React.FC = () => {
 
       <Controls 
         timer={timer}
-        onToggleTimer={() => setTimer(t => ({...t, isActive: !t.isActive}))}
+        onToggleTimer={() => setTimer(t => {
+          if (t.isActive) return { ...t, isActive: false };
+          const nextTime = t.timeLeft > 0 ? t.timeLeft : t.duration;
+          return { ...t, isActive: true, timeLeft: nextTime };
+        })}
+        teamSprintCount={teamSprintCount}
         audio={audio}
         onToggleAudio={async () => { if(audio.isPlaying){ audioService.stopAmbience(); setAudio(a=>({...a, isPlaying:false})); } else { await audioService.init(); audioService.startAmbience(audio.mode); setAudio(a=>({...a, isPlaying:true})); } }}
         onVolumeChange={(v) => { setAudio(a=>({...a, volume: v})); audioService.setVolume(v); }}
@@ -561,6 +688,7 @@ const App: React.FC = () => {
         onEnterBreakRoom={handleEnterBreakRoom}
         onTogglePiP={handleTogglePiP}
         personalPomodoro={personalPomo}
+        personalPomodoroCycles={personalPomo.cycles}
         onTogglePersonalPomodoro={handleTogglePersonalPomodoro}
       />
     </div>

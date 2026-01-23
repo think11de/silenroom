@@ -99,6 +99,7 @@ const ParticipantCard: React.FC<{ user: User }> = ({ user }) => {
              {user.stream ? (
                  <video 
                     ref={videoRef} 
+                    data-peer-id={user.id}
                     autoPlay 
                     playsInline
                     muted={user.isMe}

@@ -1,2 +1,35 @@
+@keyframes avatarDrift {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(4px, -6px, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.avatar-drift {
+  animation: avatarDrift 9s ease-in-out infinite;
+}
+
+@keyframes think11Pulse {
+  0%,
+  100% {
+    opacity: 0.01;
+    filter: blur(90px);
+    transform: translate3d(0, 0, 0) scale(0.98);
+  }
+  50% {
+    opacity: 0.06;
+    filter: blur(70px);
+    transform: translate3d(-1%, -2%, 0) scale(1.02);
+  }
+}
+
+.think11-pulse {
+  animation: think11Pulse 12s ease-in-out infinite;
+}
 /* Additional styles can be added here if needed */
 /* Main styles are in index.html <style> tag */

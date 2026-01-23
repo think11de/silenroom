@@ -41,6 +41,9 @@ export const SessionStats: React.FC<SessionStatsProps> = ({ users, isOpen, onClo
 
     const activeCount = users.filter(u => u.status !== 'idle').length;
     const totalFocus = Math.floor(activeCount / (users.length || 1) * 100);
+    const me = users.find(u => u.isMe);
+    const sprintCountToday = me?.sprintCountToday ?? 0;
+    const pomodoroCountToday = me?.pomodoroState?.completedCycles ?? 0;
 
     return (
         <div className="fixed top-24 left-4 md:left-8 z-40 w-72 glass-panel rounded-lg border border-[#f70b28]/20 shadow-2xl animate-in fade-in slide-in-from-left-4 duration-300">
@@ -68,6 +71,17 @@ export const SessionStats: React.FC<SessionStatsProps> = ({ users, isOpen, onClo
                  <div className="p-3 flex flex-col">
                     <span className="text-[9px] uppercase text-zinc-500 mb-1">Office Energy</span>
                     <span className="text-xl font-mono font-medium text-[#f70b28]">{totalFocus}%</span>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-2 border-b border-white/5">
+                <div className="p-3 border-r border-white/5 flex flex-col">
+                    <span className="text-[9px] uppercase text-zinc-500 mb-1">Sprints Today</span>
+                    <span className="text-lg font-mono font-medium text-white">{sprintCountToday}</span>
+                </div>
+                <div className="p-3 flex flex-col">
+                    <span className="text-[9px] uppercase text-zinc-500 mb-1">Pomodoros Today</span>
+                    <span className="text-lg font-mono font-medium text-white">{pomodoroCountToday}</span>
                 </div>
             </div>
 

@@ -26,6 +26,7 @@ export interface User {
   isInSprint?: boolean;
   sprintDuration?: number; 
   sprintStartTime?: number; 
+  sprintCountToday?: number;
 
   // Individual Pomodoro State
   pomodoroState?: {
@@ -61,7 +62,7 @@ export interface ChatMessage {
 export interface AudioState {
   isPlaying: boolean;
   volume: number;
-  mode: 'rain' | 'library' | 'cafe' | 'binaural'; 
+  mode: 'think11' | 'rain' | 'library' | 'cafe' | 'binaural'; 
 }
 
 export interface TimerState {
