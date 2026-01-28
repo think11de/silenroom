@@ -30,26 +30,16 @@ const createGhost = (id: string): User => ({
     id: `ghost-${id}`,
     isMe: false,
     isGhost: true,
-<<<<<<< HEAD
-    x: 10 + Math.random() * 80, // Safer margins (10-90%)
-    y: 15 + Math.random() * 70, // Safer margins (15-85%)
-=======
     x: randomInRange(SAFE_BOUNDS.minX, SAFE_BOUNDS.maxX),
     y: randomInRange(SAFE_BOUNDS.minY, SAFE_BOUNDS.maxY),
->>>>>>> 7510e8d (Update: Add Think11 ambience and UI polish)
     status: Math.random() > 0.6 ? 'focus' : 'idle',
     activityLabel: Math.random() > 0.5 ? "Deep Work" : "Reviewing",
     lastActive: Date.now(),
     focusStreak: Math.floor(Math.random() * 10),
     activeSince: Date.now() - Math.random() * 3600000,
     roomMode: 'social',
-<<<<<<< HEAD
-    anchorX: 10 + Math.random() * 80,
-    anchorY: 15 + Math.random() * 70
-=======
     anchorX: randomInRange(SAFE_BOUNDS.minX, SAFE_BOUNDS.maxX),
     anchorY: randomInRange(SAFE_BOUNDS.minY, SAFE_BOUNDS.maxY)
->>>>>>> 7510e8d (Update: Add Think11 ambience and UI polish)
 });
 
 const App: React.FC = () => {
@@ -178,19 +168,12 @@ const App: React.FC = () => {
               setGhosts(prev => {
                   const shouldAdd = Math.random() > 0.45 && prev.length < 8;
                   if (shouldAdd) {
-<<<<<<< HEAD
-                      audioService.playJoin();
-                      return [...prev, createGhost(Date.now().toString())];
-                  } else if (prev.length > 2 && Math.random() > 0.5) {
-                      audioService.playLeave();
-=======
                       // Soft ping for arrival
                       void audioService.init().then(() => audioService.playSoftPing()).catch(() => {});
                       return [...prev, createGhost(Date.now().toString())];
                   } else if (prev.length > 2) {
                       void audioService.init().then(() => audioService.playSoftExit()).catch(() => {});
                       // Remove oldest ghost
->>>>>>> 7510e8d (Update: Add Think11 ambience and UI polish)
                       return prev.slice(1); 
                   }
                   return prev;
@@ -393,12 +376,9 @@ const App: React.FC = () => {
 
 
   // --- Logic Handlers ---
-  // #region agent log
   const updateMediaStream = async (wantCam: boolean, wantMic: boolean, wantScreen: boolean = false, modeOverride?: RoomMode) => {
-      console.log('[DEBUG updateMediaStream]', {wantCam, wantMic, wantScreen, hasLocalStream: !!localStream});
       const effectiveMode = modeOverride ?? roomMode;
       if (effectiveMode === 'void') wantMic = false;
-  // #endregion
 
       // Handle Screen Share
       if (wantScreen && !isScreenSharing) {
@@ -519,12 +499,6 @@ const App: React.FC = () => {
 
   const handleEnterBreakRoom = () => {
       setIsInBreakRoom(true);
-<<<<<<< HEAD
-      // Enable Mic and Cam for Break Room automatically
-      updateMediaStream(true, true, false);
-      // Mute background audio slightly? Optional.
-      audioService.setVolume(0.2); 
-=======
       // Auto-enable camera in break room
       setRoomMode('social');
       updateMediaStream(true, true, false, 'social');
@@ -534,7 +508,6 @@ const App: React.FC = () => {
       setIsInBreakRoom(false);
       setRoomMode('void');
       updateMediaStream(isCameraOn, false, false, 'void');
->>>>>>> 7510e8d (Update: Add Think11 ambience and UI polish)
   };
 
   // Personal Pomodoro Tick

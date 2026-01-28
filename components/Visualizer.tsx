@@ -300,18 +300,9 @@ export const Visualizer: React.FC<VisualizerProps> = ({ users, roomMode, onUserC
     <div className={`relative w-full h-full overflow-hidden transition-colors duration-1000 ${isVoid ? 'bg-[#000000]' : 'bg-[#050505]'}`}> 
         <div className="absolute inset-0 pointer-events-none transition-opacity duration-1000" style={{ background: isVoid ? `radial-gradient(circle at 50% 120%, #1e1b4b 0%, #000000 60%)` : `radial-gradient(circle at 50% 120%, #1a0a05 0%, #050505 60%)` }} />
         
-<<<<<<< HEAD
-        {/* Animated background branding */}
-        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none flex items-center justify-center">
-            <div className={`text-[30vw] leading-none font-black ${isVoid ? 'text-indigo-500' : 'text-[#f70b28]'} opacity-[0.03] blur-[60px] animate-pulse transition-all duration-[5000ms]`}
-                 style={{ animationDuration: '8s' }}>
-                11
-            </div>
-=======
         {/* Static background text */}
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none">
             <div className={`absolute -bottom-20 -right-10 text-[35vw] leading-none font-black ${isVoid ? 'text-indigo-500' : 'text-[#f70b28]'} think11-pulse blur-[80px]`}>11</div>
->>>>>>> 7510e8d (Update: Add Think11 ambience and UI polish)
         </div>
 
         <NeuralBackground users={users} roomMode={roomMode} />

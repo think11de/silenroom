@@ -1,9 +1,5 @@
 import React from 'react';
-<<<<<<< HEAD
-import { Play, Pause, Volume2, VolumeX, CloudRain, Book, Coffee, Camera, CameraOff, Mic, MicOff, Activity, MessageSquare, Moon, Sun, MonitorUp, MonitorOff, Users, PictureInPicture, Timer } from 'lucide-react';
-=======
 import { Play, Pause, Volume2, VolumeX, CloudRain, Book, Coffee, Camera, CameraOff, Mic, MicOff, Activity, MessageSquare, Moon, Sun, Lock, MonitorUp, MonitorOff, Users, PictureInPicture, Timer, Sparkles } from 'lucide-react';
->>>>>>> 7510e8d (Update: Add Think11 ambience and UI polish)
 import { AudioState, TimerState, RoomMode } from '../types';
 
 interface ControlsProps {
@@ -38,12 +34,8 @@ interface ControlsProps {
   
   // New
   onTogglePiP: () => void;
-<<<<<<< HEAD
-  personalPomodoro: { isActive: boolean; timeLeft: number; cycles: number };
-=======
   personalPomodoro: { isActive: boolean; timeLeft: number };
   personalPomodoroCycles: number;
->>>>>>> 7510e8d (Update: Add Think11 ambience and UI polish)
   onTogglePersonalPomodoro: () => void;
 }
 
@@ -53,34 +45,9 @@ const formatTime = (seconds: number) => {
   return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
 };
 
-interface ControlBtnProps {
-  onClick: () => void;
-  active?: boolean;
-  disabled?: boolean;
-  icon: React.ElementType;
-  label: string;
-  badge?: number | boolean;
-  color?: string;
-}
-
-const ControlBtn: React.FC<ControlBtnProps> = ({ onClick, active, disabled, icon: Icon, label, badge, color = "bg-[#f70b28]" }) => (
-  <div className="flex flex-col items-center gap-1 group relative">
-    <button 
-      onClick={onClick} 
-      disabled={disabled}
-      className={`relative w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-300 ${active ? `${color} text-white shadow-[0_0_15px_-3px_rgba(247,11,40,0.4)]` : 'bg-white/5 text-zinc-400 hover:bg-white/10 hover:text-white'}`}
-      title={label}
-    >
-      <Icon size={18} />
-      {badge && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-[#f70b28] rounded-full border-2 border-black animate-pulse"></span>}
-    </button>
-    <span className="text-[9px] uppercase font-bold text-zinc-600 group-hover:text-zinc-400 transition-colors absolute -top-4 opacity-0 group-hover:opacity-100 whitespace-nowrap bg-black/80 px-1.5 rounded">{label}</span>
-  </div>
-);
-
 export const Controls: React.FC<ControlsProps> = ({
   timer,
-  onToggleTimer, // Team Timer
+  onToggleTimer,
   teamSprintCount,
   audio,
   onToggleAudio,
@@ -125,13 +92,8 @@ export const Controls: React.FC<ControlsProps> = ({
          {!isVoid && (
              <div className="glass-panel p-2 rounded-xl flex items-center gap-3 shadow-xl">
                  <div className="flex gap-1">
-<<<<<<< HEAD
-                    {[{ id: 'cafe', icon: Coffee, label: 'Cafe' }, { id: 'rain', icon: CloudRain, label: 'Rain' }, { id: 'library', icon: Book, label: 'Library' }].map((mode) => (
-                        <button key={mode.id} title={mode.label} onClick={() => onModeChange(mode.id as any)} className={`p-2 rounded-lg transition-all ${audio.mode === mode.id ? 'bg-[#f70b28] text-white shadow-lg scale-105' : 'text-zinc-600 hover:text-zinc-300 hover:bg-white/5'}`}><mode.icon size={16} /></button>
-=======
                     {[{ id: 'think11', icon: Sparkles }, { id: 'cafe', icon: Coffee }, { id: 'rain', icon: CloudRain }, { id: 'library', icon: Book }].map((mode) => (
                         <button key={mode.id} onClick={() => onModeChange(mode.id as any)} className={`p-1.5 rounded-md transition-all ${audio.mode === mode.id ? 'bg-[#f70b28] text-white' : 'text-zinc-600'}`}><mode.icon size={14} /></button>
->>>>>>> 7510e8d (Update: Add Think11 ambience and UI polish)
                     ))}
                  </div>
                  <div className="h-6 w-[1px] bg-white/10"></div>
@@ -169,25 +131,6 @@ export const Controls: React.FC<ControlsProps> = ({
           </div>
       </div>
 
-<<<<<<< HEAD
-      {/* Right: Actions Toolbar */}
-      <div className="pointer-events-auto glass-panel rounded-2xl p-3 flex gap-3 shadow-2xl items-center border border-white/5 bg-black/60 backdrop-blur-xl">
-          
-          {/* Pomodoro Section */}
-          <div className="flex flex-col items-center mr-1">
-             <ControlBtn 
-                onClick={onTogglePersonalPomodoro} 
-                active={personalPomodoro.isActive} 
-                icon={Timer} 
-                label="Sprint" 
-                color="bg-emerald-600"
-                badge={personalPomodoro.isActive}
-             />
-             <span className="text-[9px] font-mono text-zinc-500 mt-1">
-                 {/* @ts-ignore */}
-                 CYCLES: {personalPomodoro.cycles || 0}
-             </span>
-=======
       {/* Right: Actions */}
       <div className="pointer-events-auto glass-panel rounded-2xl p-2 flex flex-wrap gap-3 shadow-2xl">
           {/* Personal Pomodoro */}
@@ -239,27 +182,7 @@ export const Controls: React.FC<ControlsProps> = ({
             <button onClick={onToggleChat} className={`w-10 h-10 rounded-xl flex items-center justify-center ${isChatOpen ? 'bg-white/10 text-white' : 'text-zinc-400 hover:bg-white/5'}`}><MessageSquare size={18} /></button>
             {unreadCount > 0 && <span className="absolute top-0 right-0 w-3 h-3 bg-[#f70b28] rounded-full border-2 border-black"></span>}
             <span className="text-[9px] uppercase tracking-wider text-zinc-500">Chat</span>
->>>>>>> 7510e8d (Update: Add Think11 ambience and UI polish)
           </div>
-
-          <div className="w-[1px] h-8 bg-white/10"></div>
-
-          {/* Social */}
-          <ControlBtn onClick={onEnterBreakRoom} icon={Users} label="Break Room" />
-          <ControlBtn onClick={onPulse} icon={Activity} label="Pulse" />
-          
-          <div className="w-[1px] h-8 bg-white/10"></div>
-
-          {/* Media */}
-          <ControlBtn onClick={onToggleCamera} active={isCameraOn} disabled={isVoid} icon={isCameraOn ? Camera : CameraOff} label="Cam" color="bg-white !text-black" />
-          <ControlBtn onClick={onToggleMic} active={isMicOn} disabled={isVoid} icon={isMicOn ? Mic : MicOff} label="Mic" />
-          <ControlBtn onClick={onToggleScreenShare} active={isScreenSharing} disabled={isVoid} icon={isScreenSharing ? MonitorUp : MonitorOff} label="Share" />
-          
-          <div className="w-[1px] h-8 bg-white/10"></div>
-
-          {/* Tools */}
-          <ControlBtn onClick={onTogglePiP} icon={PictureInPicture} label="PiP" />
-          <ControlBtn onClick={onToggleChat} active={isChatOpen} icon={MessageSquare} label="Chat" badge={unreadCount > 0} color="bg-zinc-800" />
       </div>
 
     </div>
